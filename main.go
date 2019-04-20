@@ -1,21 +1,24 @@
 package main
 
 import (
-  "html/template"
-  "net/http"
-  "log"
-  "flag"
+	"flag"
+	"fmt"
+	"html/template"
+	"log"
+	"net/http"
 
-  "periph.io/x/periph/conn/i2c/i2creg"
-  "periph.io/x/periph/experimental/devices/mcp9808"
-  "periph.io/x/periph/host"
+	"periph.io/x/periph/conn/i2c/i2creg"
+	"periph.io/x/periph/experimental/devices/mcp9808"
+	"periph.io/x/periph/host"
 )
 
 var dev bool
+var port int
 
 func init() {
-  flag.BoolVar(&dev, "dev", false, "development mode")
-  flag.Parse()
+	flag.BoolVar(&dev, "dev", false, "development mode")
+	flag.IntVar(&port, "port", 80, "port to serve on")
+	flag.Parse()
 }
 
 func readTemp() int {
@@ -48,21 +51,24 @@ func readTemp() int {
 }
 
 func serveTemplate(w http.ResponseWriter, r *http.Request) {
-  tmpl := template.Must(template.ParseFiles("static/index.html"))
-  
-  temp := 65
-  if !dev {
-    temp = readTemp()
-  }
+	tmpl := template.Must(template.ParseFiles("static/index.html"))
 
-  tmpl.Execute(w, temp)
+	temp := 65
+	if !dev {
+		temp = readTemp()
+	}
+
+	tmpl.Execute(w, temp)
 }
 
 func main() {
-  fs := http.FileServer(http.Dir("static"))
-  http.Handle("/static/", http.StripPrefix("/static/", fs))
-  
-  http.HandleFunc("/", serveTemplate)
-  
-  http.ListenAndServe(":80", nil)
+	fs := http.FileServer(http.Dir("static"))
+	http.Handle("/static/", http.StripPrefix("/static/", fs))
+
+	http.HandleFunc("/", serveTemplate)
+
+	addr := fmt.Sprintf(":%v", port)
+	log.Printf("Listening on http://localhost%v ...\n", addr)
+
+	http.ListenAndServe(addr, nil)
 }
