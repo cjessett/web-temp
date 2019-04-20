@@ -1,0 +1,36 @@
+body {
+  text-align: center;
+  font-family: arial, helvitica, sans-serif;
+}
+
+header {
+  margin-top: 2em;
+  font-size: 3em;
+}
+
+section {
+  margin: 3em;
+}
+
+#temperature {
+  font-size: 10em;
+}
+
+#deg {
+  vertical-align: top;
+  font-size: 5em;
+}
+
+@media only screen and (max-device-width: 480px) {
+    header {
+      font-size: 4em;
+    }
+
+    #temperature {
+      font-size: 22em;
+    }
+    
+    #deg {
+      font-size: 11em;
+    }
+}
